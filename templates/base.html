@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PayRoute &bull; Digital Payment Route Optimizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand brand-title" href="/">
+                <i class="bi bi-diagram-3-fill text-primary"></i> PayRoute
+                <span class="brand-badge">Interbank Route Optimizer</span>
+            </a>
+            <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom" href="/">
+                            <i class="bi bi-house-door me-1"></i> Architecture
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-link-custom text-info" href="/audit_logs">
+                            <i class="bi bi-database me-1"></i> Audit Ledger
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-warning text-dark fw-bold px-3 py-1" style="font-size: 0.85rem;" href="/checkout">
+                            <i class="bi bi-wallet2 me-1"></i> Razorpay Gateway
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-4 flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="py-3 text-center border-top">
+        <div class="container">
+            Digital Payment Route Optimizer &bull; Graph Algorithms: Dijkstra, Greedy & BFS across 7+ Indian Banks
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
