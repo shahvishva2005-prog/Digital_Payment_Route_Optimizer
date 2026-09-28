@@ -1,55 +1,38 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="row align-items-center g-5 py-4">
-    <div class="col-lg-7">
-        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 fw-semibold mb-3">
-            <i class="bi bi-diagram-3 me-1"></i> Final Year Algorithm Project
-        </span>
-        <h1 class="display-5 fw-bold text-dark lh-sm mb-3">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Payment Route Optimizer</title>
+    <!-- Relative path to your CSS file -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar-custom">
+        <div class="brand-title">
             Digital Payment Route Optimizer
-        </h1>
-        <p class="lead text-muted mb-4" style="font-size: 1.05rem;">
+            <span class="brand-badge">Algorithm Project</span>
+        </div>
+    </nav>
+
+    <div class="dashboard-card">
+        <div class="card-header-clean">
+            <h1 class="card-title-clean">Digital Payment Route Optimizer</h1>
+        </div>
+        <p>
             When an online transaction is executed, payments travel through multiple possible routes: 
-            <strong>Customer ➔ Bank A ➔ Payment Gateway ➔ Bank B ➔ Merchant</strong>. 
+            <em>Customer &rarr; Bank A &rarr; Payment Gateway &rarr; Bank B &rarr; Merchant</em>.
             This system evaluates interbank network graphs to select the most cost-effective and low-latency route in real time.
         </p>
-        <div class="d-flex flex-wrap gap-2">
-            <a href="/checkout" class="btn btn-warning btn-lg fw-bold px-4 text-dark shadow-sm">
-                <i class="bi bi-play-circle me-1"></i> Launch Payment Gateway
-            </a>
-            <a href="/audit_logs" class="btn btn-outline-secondary btn-lg px-4 shadow-sm">
-                <i class="bi bi-database me-1"></i> View SQLite Ledger
-            </a>
-        </div>
-    </div>
-    <div class="col-lg-5">
-        <div class="dashboard-card shadow-sm p-4 bg-white border">
-            <h6 class="fw-bold text-dark mb-3"><i class="bi bi-sliders text-primary me-2"></i> Evaluated Algorithms</h6>
-            
-            <div class="d-flex align-items-start mb-3">
-                <div class="badge bg-success rounded-circle p-2 me-3"><i class="bi bi-check2-circle fs-6"></i></div>
-                <div>
-                    <h6 class="mb-0 fw-bold">1. Dijkstra's Shortest Path</h6>
-                    <small class="text-muted">Minimizes accumulated transaction fees (₹) and processing latency.</small>
-                </div>
-            </div>
 
-            <div class="d-flex align-items-start mb-3">
-                <div class="badge bg-primary rounded-circle p-2 me-3"><i class="bi bi-compass fs-6"></i></div>
-                <div>
-                    <h6 class="mb-0 fw-bold">2. Greedy Approach</h6>
-                    <small class="text-muted">Selects the neighbor with the immediate lowest fee at each hop.</small>
-                </div>
-            </div>
-
-            <div class="d-flex align-items-start">
-                <div class="badge bg-secondary rounded-circle p-2 me-3"><i class="bi bi-diagram-2 fs-6"></i></div>
-                <div>
-                    <h6 class="mb-0 fw-bold">3. Breadth-First Search (BFS)</h6>
-                    <small class="text-muted">Discovers the most direct path requiring the fewest interbank hops.</small>
-                </div>
-            </div>
-        </div>
+        <h2>Evaluated Algorithms</h2>
+        <ul>
+            <li><strong>1. Dijkstra's Shortest Path:</strong> Minimizes accumulated transaction fees (₹) and processing latency.</li>
+            <li><strong>2. Greedy Approach:</strong> Selects the neighbor with the immediate lowest fee at each hop.</li>
+            <li><strong>3. Breadth-First Search (BFS):</strong> Discovers the most direct path requiring the fewest interbank hops.</li>
+        </ul>
     </div>
-</div>
-{% endblock %}
+
+</body>
+</html>
