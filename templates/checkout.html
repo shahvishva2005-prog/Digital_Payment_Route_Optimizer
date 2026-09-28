@@ -1,0 +1,309 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-xl-9 col-lg-10 col-md-11">
+        <div class="card border-0 shadow-lg overflow-hidden" style="border-radius: 20px; background: #ffffff;">
+            <div class="row g-0">
+                
+                <!-- Left Sidebar: Merchant Profile & Summary -->
+                <div class="col-md-5 p-4 p-lg-5 text-white d-flex flex-column justify-content-between" 
+                     style="background: linear-gradient(160deg, #0b192c 0%, #1e3e62 100%);">
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="bg-primary text-white rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-shop-window fs-5"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">Acme Corp India</h6>
+                                    <small class="text-white-50" style="font-size: 0.72rem;">Merchant ID: MID_892348</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-warning text-dark fw-bold px-2 py-1" style="font-size: 0.65rem;">LIVE GATEWAY</span>
+                        </div>
+
+                        <!-- Amount Highlight Card -->
+                        <div class="p-3 rounded-4 mb-3" style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.12);">
+                            <small class="text-uppercase text-white-50 fw-semibold" style="font-size: 0.7rem; letter-spacing: 0.8px;">Amount Due</small>
+                            <div class="d-flex align-items-baseline gap-1 mt-1">
+                                <span class="fs-4 text-white-50">₹</span>
+                                <span class="display-6 fw-bold text-white" id="displayAmount">4,500.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Live Account Balance Badge & Modal Trigger -->
+                        <div class="p-3 rounded-4 mb-4 border" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3) !important;">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="text-white-50 small fw-bold text-uppercase" style="font-size: 0.68rem;">Customer Bank Balance</span>
+                                <button type="button" class="btn btn-sm btn-outline-light py-0 px-2 fw-semibold" style="font-size: 0.7rem;" onclick="checkBalanceModal()">
+                                    <i class="bi bi-wallet2 me-1"></i> Check Balance
+                                </button>
+                            </div>
+                            <div class="fs-4 fw-bold text-emerald-400 text-success" id="sidebarBalance">
+                                ₹{{ "{:,.2f}".format(balance) }}
+                            </div>
+                        </div>
+
+                        <!-- Order Mini-List -->
+                        <div class="space-y-2 mb-4" style="font-size: 0.82rem;">
+                            <div class="d-flex justify-content-between text-white-50 py-1 border-bottom border-white-10">
+                                <span>Order Reference</span>
+                                <span class="text-white font-monospace">#ORD-2026-9042</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-white-50 py-1 border-bottom border-white-10">
+                                <span>Routing Policy</span>
+                                <span class="text-success fw-semibold">Dijkstra Min-Cost</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top border-white-10" style="font-size: 0.75rem;">
+                        <div class="d-flex align-items-center gap-2 text-white-50 mb-1">
+                            <i class="bi bi-shield-lock-fill text-success fs-6"></i>
+                            <span>256-Bit SSL Encrypted &bull; NPCI Regulated</span>
+                        </div>
+                        <small class="text-white-50 d-block">Powered by PayRoute Algorithmic Engine</small>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Form & Source Credentials -->
+                <div class="col-md-7 p-4 p-lg-5 bg-white">
+                    <form action="/process_payment" method="POST" id="checkoutForm">
+                        
+                        <!-- Editable Amount Input -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label text-muted fw-bold text-uppercase mb-0" style="font-size: 0.72rem; letter-spacing: 0.5px;">Transfer Amount (₹)</label>
+                                <span class="text-muted small" style="font-size: 0.7rem;">Avail: <strong class="text-dark" id="formAvailBal">₹{{ "{:,.2f}".format(balance) }}</strong></span>
+                            </div>
+                            <div class="input-group input-group-lg border rounded-3 overflow-hidden shadow-sm">
+                                <span class="input-group-text bg-light border-0 fw-bold text-dark px-3">₹</span>
+                                <input type="number" name="amount" id="amountInput" class="form-control border-0 fw-bold fs-4 text-dark" value="4500" min="1" step="any" required>
+                            </div>
+                        </div>
+
+                        <!-- Payment Source Selector -->
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Payment Source</label>
+                            <div class="row g-2">
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="payment_mode" id="mode_upi" value="UPI" checked onchange="toggleFields('UPI')">
+                                    <label class="btn btn-outline-light text-dark border p-2 w-100 text-center rounded-3 option-tile" for="mode_upi">
+                                        <i class="bi bi-qr-code text-success fs-5 d-block mb-1"></i>
+                                        <span class="fw-bold d-block" style="font-size: 0.8rem;">UPI</span>
+                                    </label>
+                                </div>
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="payment_mode" id="mode_card" value="Card" onchange="toggleFields('Card')">
+                                    <label class="btn btn-outline-light text-dark border p-2 w-100 text-center rounded-3 option-tile" for="mode_card">
+                                        <i class="bi bi-credit-card text-primary fs-5 d-block mb-1"></i>
+                                        <span class="fw-bold d-block" style="font-size: 0.8rem;">Card</span>
+                                    </label>
+                                </div>
+                                <div class="col-4">
+                                    <input type="radio" class="btn-check" name="payment_mode" id="mode_net" value="Netbanking" onchange="toggleFields('Netbanking')">
+                                    <label class="btn btn-outline-light text-dark border p-2 w-100 text-center rounded-3 option-tile" for="mode_net">
+                                        <i class="bi bi-bank2 text-info fs-5 d-block mb-1"></i>
+                                        <span class="fw-bold d-block" style="font-size: 0.8rem;">NetBanking</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DYNAMIC FIELDS: UPI -->
+                        <div id="fields_upi" class="p-3 bg-light rounded-3 mb-3 border">
+                            <label class="form-label text-dark fw-bold small mb-1">Virtual Payment Address (UPI ID)</label>
+                            <input type="text" name="upi_id" id="upi_id" class="form-control" placeholder="e.g. user@oksbi" value="vishwa@okhdfcbank">
+                        </div>
+
+                        <!-- DYNAMIC FIELDS: CARD -->
+                        <div id="fields_card" class="p-3 bg-light rounded-3 mb-3 border d-none">
+                            <label class="form-label text-dark fw-bold small mb-1">Card Number (16 Digits)</label>
+                            <input type="text" name="card_number" id="card_number" class="form-control mb-2" placeholder="4532 8923 1120 4912" maxlength="16">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <label class="form-label text-dark fw-bold small mb-1">Expiry (MM/YY)</label>
+                                    <input type="text" name="card_expiry" id="card_expiry" class="form-control" placeholder="12/28" maxlength="5">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label text-dark fw-bold small mb-1">CVV</label>
+                                    <input type="password" name="card_cvv" id="card_cvv" class="form-control" placeholder="123" maxlength="3">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DYNAMIC FIELDS: NETBANKING -->
+                        <div id="fields_netbanking" class="p-3 bg-light rounded-3 mb-3 border d-none">
+                            <label class="form-label text-dark fw-bold small mb-1">NetBanking User ID</label>
+                            <input type="text" name="netbanking_id" id="netbanking_id" class="form-control" placeholder="e.g. HDFC892301">
+                        </div>
+
+                        <!-- Ingress Bank Selection -->
+                        <div class="mb-3">
+                            <label class="form-label text-muted fw-bold text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Select Ingress Bank</label>
+                            <select name="bank" class="form-select" required>
+                                <option value="SBI_Bank">State Bank of India (SBI)</option>
+                                <option value="HDFC_Bank" selected>HDFC Bank</option>
+                                <option value="ICICI_Bank">ICICI Bank</option>
+                                <option value="Axis_Bank">Axis Bank</option>
+                                <option value="Kotak_Bank">Kotak Mahindra Bank</option>
+                                <option value="PNB_Bank">Punjab National Bank (PNB)</option>
+                                <option value="Bank_of_Baroda">Bank of Baroda</option>
+                            </select>
+                        </div>
+
+                        <!-- Downtime Simulation Toggle -->
+                        <div class="form-check form-switch mb-4 p-2 bg-light rounded-3 border ps-5">
+                            <input class="form-check-input" type="checkbox" name="simulate_downtime" id="simulate_downtime">
+                            <label class="form-check-label text-danger fw-bold small" for="simulate_downtime">
+                                <i class="bi bi-lightning-charge-fill me-1"></i> Simulate Bank Ingress Downtime
+                            </label>
+                        </div>
+
+                        <!-- Pay CTA Button -->
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-sm d-flex justify-content-between align-items-center px-4 rounded-3" 
+                                style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none;">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="bi bi-lock-fill"></i>
+                                <span>Pay Now & Route</span>
+                            </span>
+                            <span class="badge bg-white text-dark py-2 px-3 fw-bold fs-6 shadow-sm" id="btnAmountBadge">₹4,500</span>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Pop-up Check Balance & Demo Controls (₹20 to ₹2 Crore) -->
+<div class="modal fade" id="balanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="p-3 text-white d-flex justify-content-between align-items-center" style="background: #0f172a;">
+                <h6 class="modal-title fw-bold mb-0"><i class="bi bi-wallet2 text-success me-2"></i> Account Liquidity Check</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="p-4 text-center bg-white">
+                <div class="p-3 rounded-circle bg-light d-inline-block mb-2 border">
+                    <i class="bi bi-cash-stack text-success display-6"></i>
+                </div>
+                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.72rem;">Available Checking Balance</small>
+                <div class="display-6 fw-bold text-dark my-1" id="modalBalanceDisplay">₹{{ "{:,.2f}".format(balance) }}</div>
+                <small class="text-muted d-block mb-3" style="font-size: 0.75rem;">Verified via Core Interbank Settlement Rail</small>
+
+                <!-- Quick Simulation Setter Range (₹20 to ₹2 Crore) -->
+                <div class="p-3 bg-light rounded-3 border text-start">
+                    <small class="text-muted fw-bold d-block mb-2" style="font-size: 0.72rem;">Demo Balance Switcher (₹20 to ₹2 Cr):</small>
+                    
+                    <div class="d-flex flex-wrap gap-2 mb-2">
+                        <button type="button" class="btn btn-outline-danger btn-sm flex-grow-1" onclick="setDemoBalance(25.0)">
+                            Default (₹25)
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm flex-grow-1" onclick="setDemoBalance(20.0)">
+                            Min (₹20)
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-sm flex-grow-1" onclick="setDemoBalance(50000.0)">
+                            ₹50,000
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm flex-grow-1" onclick="setDemoBalance(20000000.0)">
+                            Max (₹2 Cr)
+                        </button>
+                    </div>
+
+                    <!-- Custom Balance Input -->
+                    <div class="input-group input-group-sm mt-2">
+                        <span class="input-group-text">Custom ₹</span>
+                        <input type="number" id="customBalInput" class="form-control" placeholder="20 to 20000000" min="20" max="20000000" value="25">
+                        <button class="btn btn-dark" type="button" onclick="applyCustomBalance()">Apply</button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-2 bg-light text-center border-top">
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-semibold" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const amountInput = document.getElementById('amountInput');
+const displayAmount = document.getElementById('displayAmount');
+const btnAmountBadge = document.getElementById('btnAmountBadge');
+
+amountInput.addEventListener('input', function() {
+    const val = parseFloat(this.value) || 0;
+    const formatted = val.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    displayAmount.innerText = formatted;
+    btnAmountBadge.innerText = '₹' + Math.round(val).toLocaleString('en-IN');
+});
+
+function toggleFields(mode) {
+    document.getElementById('fields_upi').classList.add('d-none');
+    document.getElementById('fields_card').classList.add('d-none');
+    document.getElementById('fields_netbanking').classList.add('d-none');
+
+    if (mode === 'UPI') {
+        document.getElementById('fields_upi').classList.remove('d-none');
+    } else if (mode === 'Card') {
+        document.getElementById('fields_card').classList.remove('d-none');
+    } else if (mode === 'Netbanking') {
+        document.getElementById('fields_netbanking').classList.remove('d-none');
+    }
+}
+
+function checkBalanceModal() {
+    fetch('/api/check_balance')
+        .then(res => res.json())
+        .then(data => {
+            const formatted = '₹' + data.balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('modalBalanceDisplay').innerText = formatted;
+            document.getElementById('sidebarBalance').innerText = formatted;
+            document.getElementById('formAvailBal').innerText = formatted;
+            const myModal = new bootstrap.Modal(document.getElementById('balanceModal'));
+            myModal.show();
+        });
+}
+
+function setDemoBalance(amt) {
+    const formData = new FormData();
+    formData.append('new_balance', amt);
+    fetch('/api/set_balance', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+            const formatted = '₹' + data.balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('modalBalanceDisplay').innerText = formatted;
+            document.getElementById('sidebarBalance').innerText = formatted;
+            document.getElementById('formAvailBal').innerText = formatted;
+        });
+}
+
+function applyCustomBalance() {
+    let amt = parseFloat(document.getElementById('customBalInput').value);
+    if (isNaN(amt) || amt < 20) amt = 20.0;
+    if (amt > 20000000) amt = 20000000.0;
+    setDemoBalance(amt);
+}
+</script>
+
+<style>
+.option-tile {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background: #ffffff;
+}
+.option-tile:hover {
+    border-color: #2563eb !important;
+    background: #f8fafc;
+}
+.btn-check:checked + .option-tile {
+    border-color: #10b981 !important;
+    background: #ecfdf5 !important;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
+}
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+</style>
+{% endblock %}

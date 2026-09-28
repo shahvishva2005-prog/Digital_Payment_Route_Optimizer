@@ -1,0 +1,490 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+
+    <!-- SUCCESS CASE: Route Found & Executed -->
+    {% if status == 'SUCCESS' %}
+    <div class="col-12">
+        <div class="card border-0 shadow-sm px-4 py-3 bg-white" style="border-radius: 14px;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="p-2 rounded-3 bg-primary-subtle text-primary fs-4">
+                        <i class="bi bi-globe-americas"></i>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <h5 class="fw-bold mb-0 text-dark">LIVE PAYMENT CORRIDORS</h5>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 0.7rem;">
+                                <i class="bi bi-record-fill me-1"></i> ACTIVE
+                            </span>
+                        </div>
+                        <small class="text-muted">Real-time Regulated Interbank Clearing &bull; Source Verified: <strong class="text-dark">{{ masked_source }}</strong></small>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="border rounded-3 px-3 py-2 bg-light text-center">
+                        <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Remaining Balance</small>
+                        <span class="fw-bold text-success fs-6">₹{{ "%.2f"|format(new_balance) }}</span>
+                    </div>
+                    <div class="border rounded-3 px-3 py-2 bg-light text-center">
+                        <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Clearing Latency</small>
+                        <span class="fw-bold text-dark fs-6">{{ dijkstra.total_latency if dijkstra else 40 }} ms</span>
+                    </div>
+                    <div class="border rounded-3 px-3 py-2 bg-light text-center">
+                        <small class="text-muted d-block text-uppercase" style="font-size: 0.65rem; font-weight: 700;">Network Uptime</small>
+                        <span class="fw-bold text-primary fs-6">99.9%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Live Payment Corridor Map -->
+    <div class="col-lg-8">
+        <div class="card border-0 shadow-sm bg-white position-relative overflow-hidden mb-4" style="border-radius: 16px;">
+            <div class="p-3 d-flex justify-content-between align-items-center border-bottom">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-light text-dark border px-2 py-1" style="font-size: 0.72rem; font-weight: 700;">
+                        ACTIVE DISPATCH: {{ bank }} ➔ MERCHANT
+                    </span>
+                    <small class="text-muted">Interactive Bézier Clearing Rails</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <button class="btn btn-sm btn-outline-secondary py-1 px-3" style="font-size: 0.75rem;" onclick="replayPacketAnimation()">
+                        <i class="bi bi-arrow-repeat me-1"></i> Replay Stream
+                    </button>
+                    <span class="badge bg-success text-white px-2 py-1" id="packetStatus" style="font-size: 0.72rem;">Live Stream Active</span>
+                </div>
+            </div>
+
+            <div class="position-relative text-center p-2" style="background: radial-gradient(circle at 50% 50%, #fbfcfe 0%, #f1f5f9 100%);">
+                <canvas id="corridorCanvas" width="820" height="440" style="width: 100%; max-width: 820px; height: auto;"></canvas>
+
+                <div class="position-absolute shadow-sm border rounded-3 p-2 bg-white text-start d-none d-md-block" 
+                     style="top: 25px; left: 45%; transform: translateX(-50%); width: 220px; border-color: rgba(34, 197, 94, 0.4) !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="text-dark" style="font-size: 0.78rem;"><i class="bi bi-arrow-left-right text-success me-1"></i> LIVE CORRIDOR</strong>
+                        <span class="badge bg-success-subtle text-success py-0 px-1" style="font-size: 0.65rem;">ACTIVE</span>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.7rem;">Settlement Rate: <span class="fw-bold text-dark">₹{{ dijkstra.total_cost }}</span></div>
+                    <div class="text-muted" style="font-size: 0.7rem;">Selected Algorithm: <span class="fw-bold text-primary">Dijkstra</span></div>
+                </div>
+            </div>
+
+            <div class="px-4 py-3 bg-white border-top d-flex flex-wrap justify-content-between align-items-center text-muted" style="font-size: 0.78rem;">
+                <div class="d-flex gap-4">
+                    <span><i class="bi bi-broadcast text-success me-1"></i> <strong>Live Rails:</strong> Optimal Cost Path</span>
+                    <span><i class="bi bi-dash text-secondary me-1"></i> <strong>Standby Rails:</strong> Secondary Liquidity</span>
+                </div>
+                <div class="d-flex gap-3 align-items-center">
+                    <span><i class="bi bi-shield-lock-fill text-primary"></i> Institutional Grade 256-Bit</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 Syllabus Algorithms Table -->
+        <div class="dashboard-card shadow-sm bg-white">
+            <div class="card-header-clean">
+                <h5 class="card-title-clean">
+                    <i class="bi bi-sliders text-primary"></i> Comparative Routing Analysis (3 Syllabus Algorithms)
+                </h5>
+                <span class="badge bg-secondary">7+ Bank Network Evaluation</span>
+            </div>
+
+            <div class="table-responsive small">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Algorithm</th>
+                            <th>Computed Route Path</th>
+                            <th>Total Fee (₹)</th>
+                            <th>Latency</th>
+                            <th>Hops</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="table-success">
+                            <td class="fw-bold text-success"><i class="bi bi-check-circle-fill me-1"></i> {{ dijkstra.algorithm }}</td>
+                            <td class="font-monospace text-dark">{{ dijkstra.path_display }}</td>
+                            <td class="fw-bold text-success">₹{{ dijkstra.total_cost }}</td>
+                            <td>{{ dijkstra.total_latency }} ms</td>
+                            <td>{{ dijkstra.hops }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-primary"><i class="bi bi-compass me-1"></i> {{ greedy.algorithm }}</td>
+                            <td class="font-monospace">{{ greedy.path_display }}</td>
+                            <td>₹{{ greedy.total_cost }}</td>
+                            <td>{{ greedy.total_latency }} ms</td>
+                            <td>{{ greedy.hops }}</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold text-secondary"><i class="bi bi-diagram-2 me-1"></i> {{ bfs.algorithm }}</td>
+                            <td class="font-monospace">{{ bfs.path_display }}</td>
+                            <td>₹{{ bfs.total_cost }}</td>
+                            <td>{{ bfs.total_latency }} ms</td>
+                            <td>{{ bfs.hops }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Audit Receipt Invoice with Balances -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm p-4 bg-white" id="invoiceReceipt" style="border: 2px dashed #cbd5e1; border-radius: 16px;">
+            <div class="text-center py-2 border-bottom">
+                <div class="fw-bold fs-5 text-dark"><i class="bi bi-check-circle text-success"></i> PayRoute Verified</div>
+                <small class="text-muted">Live Corridor Clearing Receipt</small>
+            </div>
+
+            <div class="py-3">
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Amount Cleared:</span>
+                    <strong class="fs-6 text-dark">₹{{ amount }}</strong>
+                </div>
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Origin Bank:</span>
+                    <span>{{ bank }}</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Payment Channel:</span>
+                    <span>{{ mode }} ({{ masked_source }})</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Routing Algorithm:</span>
+                    <span class="text-success fw-bold">Dijkstra Optimal</span>
+                </div>
+                <div class="d-flex justify-content-between small mb-2">
+                    <span class="text-muted">Optimized Network Fee:</span>
+                    <span class="fw-bold text-primary">₹{{ dijkstra.total_cost if dijkstra else 0 }}</span>
+                </div>
+                
+                <!-- Balance Breakdown Box -->
+                <div class="p-2 my-2 bg-light rounded-3 border">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Previous Balance:</span>
+                        <span>₹{{ "%.2f"|format(prev_balance) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span class="text-muted">Deducted Amount:</span>
+                        <span class="text-danger">-₹{{ "%.2f"|format(amount) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between small pt-1 border-top fw-bold">
+                        <span class="text-dark">New Available Balance:</span>
+                        <span class="text-success">₹{{ "%.2f"|format(new_balance) }}</span>
+                    </div>
+                </div>
+
+                <hr>
+                <small class="text-muted d-block mb-1">Dispatched Clearing Route:</small>
+                <div class="font-monospace bg-light p-2 rounded small text-break border" style="font-size: 0.72rem;">
+                    {{ dijkstra.path_display if dijkstra else 'Direct' }}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-dark flex-grow-1 btn-sm py-2 fw-semibold" onclick="downloadReceiptScreenshot()">
+                    <i class="bi bi-camera me-1"></i> Screenshot (PNG)
+                </button>
+                <a href="/checkout" class="btn btn-primary btn-sm py-2 px-3 fw-semibold">
+                    <i class="bi bi-arrow-left me-1"></i> Gateway
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- FAILURE / REJECTION CASE: Details & Incident Breakdown -->
+    {% if status == 'FAILED' %}
+    <div class="col-lg-8 mx-auto">
+        <div class="card shadow-lg border-0 overflow-hidden" style="border-radius: 16px;">
+            <div class="p-4 text-white d-flex align-items-center gap-3" style="background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);">
+                <div class="display-5"><i class="bi bi-x-octagon-fill"></i></div>
+                <div>
+                    <span class="badge bg-white text-danger fw-bold text-uppercase px-2 py-1 mb-1" style="font-size: 0.7rem;">TRANSACTION INTERCEPTED</span>
+                    <h4 class="fw-bold mb-0">Payment Aborted at Ingress Rail</h4>
+                    <small class="opacity-75">Routing Engine Guard &bull; Zero Capital Deducted</small>
+                </div>
+            </div>
+
+            <div class="p-4 bg-white">
+                <div class="alert alert-danger-subtle text-danger border border-danger-subtle p-3 rounded-3 mb-4">
+                    <h6 class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Failure Diagnosis</h6>
+                    <p class="small mb-0">{{ reason }}</p>
+                </div>
+
+                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-file-earmark-text text-primary me-2"></i> Attempted Credential Audit</h6>
+                <div class="table-responsive small mb-4">
+                    <table class="table table-bordered align-middle">
+                        <tbody>
+                            <tr>
+                                <th class="bg-light" style="width: 35%;">Attempted Transfer Amount</th>
+                                <td class="fw-bold text-dark fs-6">₹{{ amount }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Available Account Balance</th>
+                                <td class="fw-bold text-danger">₹{{ "%.2f"|format(prev_balance) }} (Insufficient)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Payment Method</th>
+                                <td>{{ mode }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Credential Identifier</th>
+                                <td class="font-monospace text-muted">{{ masked_source }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Target Institution</th>
+                                <td>{{ bank }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Interbank Routing Status</th>
+                                <td class="text-danger fw-semibold"><i class="bi bi-slash-circle me-1"></i> Terminated & Aborted (No packet dispatched)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                    <a href="/checkout" class="btn btn-primary px-4 fw-bold">
+                        <i class="bi bi-arrow-counterclockwise me-1"></i> Back to Gateway
+                    </a>
+                    <a href="/audit_logs" class="btn btn-outline-secondary px-3">
+                        <i class="bi bi-database me-1"></i> Verify in Audit Ledger
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+<!-- AiraPay Styled Canvas Vector Graph Script -->
+<script>
+const activePath = {{ (active_path if active_path is defined and active_path else []) | tojson | safe }};
+
+const nodes = {
+    "Customer":        { x: 75,  y: 220, label: "Customer Ingress", sub: "ORIGIN",  type: "endpoint" },
+    "SBI_Bank":        { x: 220, y: 110, label: "SBI Bank",        sub: "TIER-1",  type: "bank" },
+    "HDFC_Bank":       { x: 220, y: 320, label: "HDFC Bank",       sub: "TIER-1",  type: "bank" },
+    "PNB_Bank":        { x: 370, y: 80,  label: "PNB",             sub: "COMM",    type: "bank" },
+    "Bank_of_Baroda":  { x: 520, y: 80,  label: "Bank of Baroda",  sub: "COMM",    type: "bank" },
+    "ICICI_Bank":      { x: 360, y: 350, label: "ICICI Bank",      sub: "COMM",    type: "bank" },
+    "Axis_Bank":       { x: 450, y: 280, label: "Axis Bank",       sub: "COMM",    type: "bank" },
+    "Kotak_Bank":      { x: 570, y: 300, label: "Kotak Bank",      sub: "COMM",    type: "bank" },
+    "Razorpay_Gateway":{ x: 400, y: 190, label: "Razorpay Switch", sub: "GATEWAY", type: "switch" },
+    "NPCI_IMPS_Rail":  { x: 560, y: 160, label: "NPCI IMPS Rail",  sub: "CLEARING",type: "switch" },
+    "Merchant":        { x: 745, y: 220, label: "Merchant Settlement", sub: "DEST", type: "endpoint" }
+};
+
+const edges = [
+    { from: "Customer", to: "SBI_Bank" },
+    { from: "Customer", to: "HDFC_Bank" },
+    { from: "SBI_Bank", to: "PNB_Bank" },
+    { from: "SBI_Bank", to: "Bank_of_Baroda" },
+    { from: "SBI_Bank", to: "Razorpay_Gateway" },
+    { from: "SBI_Bank", to: "NPCI_IMPS_Rail" },
+    { from: "HDFC_Bank", to: "ICICI_Bank" },
+    { from: "HDFC_Bank", to: "Axis_Bank" },
+    { from: "HDFC_Bank", to: "Razorpay_Gateway" },
+    { from: "PNB_Bank", to: "Bank_of_Baroda" },
+    { from: "Bank_of_Baroda", to: "Merchant" },
+    { from: "ICICI_Bank", to: "Kotak_Bank" },
+    { from: "Axis_Bank", to: "Kotak_Bank" },
+    { from: "Kotak_Bank", to: "Merchant" },
+    { from: "Razorpay_Gateway", to: "Merchant" },
+    { from: "NPCI_IMPS_Rail", to: "Merchant" }
+];
+
+const canvas = document.getElementById("corridorCanvas");
+let ctx = canvas ? canvas.getContext("2d") : null;
+let streamProgress = 0.0;
+let renderTimer = null;
+
+function isPathEdge(u, v) {
+    for (let i = 0; i < activePath.length - 1; i++) {
+        if (activePath[i] === u && activePath[i+1] === v) return true;
+    }
+    return false;
+}
+
+function drawArc(ctx, p1, p2, color, lineWidth, dashed = false) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = lineWidth;
+    if (dashed) ctx.setLineDash([4, 6]);
+
+    const midX = (p1.x + p2.x) / 2;
+    const midY = (p1.y + p2.y) / 2 - 25;
+
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+    ctx.stroke();
+    ctx.restore();
+}
+
+function getBezierPoint(p1, p2, t) {
+    const midX = (p1.x + p2.x) / 2;
+    const midY = (p1.y + p2.y) / 2 - 25;
+    const x = (1 - t) * (1 - t) * p1.x + 2 * (1 - t) * t * midX + t * t * p2.x;
+    const y = (1 - t) * (1 - t) * p1.y + 2 * (1 - t) * t * midY + t * t * p2.y;
+    return { x, y };
+}
+
+function drawMapBackground() {
+    ctx.fillStyle = "#e2e8f0";
+    for (let i = 40; i < canvas.width - 40; i += 30) {
+        for (let j = 40; j < canvas.height - 40; j += 30) {
+            ctx.beginPath();
+            ctx.arc(i, j, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
+
+function renderFrame() {
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    drawMapBackground();
+
+    edges.forEach(e => {
+        const u = nodes[e.from];
+        const v = nodes[e.to];
+        if (!u || !v) return;
+        if (!isPathEdge(e.from, e.to)) {
+            drawArc(ctx, u, v, "#cbd5e1", 1.5, true);
+        }
+    });
+
+    edges.forEach(e => {
+        const u = nodes[e.from];
+        const v = nodes[e.to];
+        if (!u || !v) return;
+        if (isPathEdge(e.from, e.to)) {
+            ctx.save();
+            ctx.shadowColor = "rgba(16, 185, 129, 0.4)";
+            ctx.shadowBlur = 10;
+            drawArc(ctx, u, v, "#10b981", 3.5, false);
+            ctx.restore();
+        }
+    });
+
+    for (const key in nodes) {
+        const n = nodes[key];
+        const isInPath = activePath.includes(key);
+
+        if (isInPath) {
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, 14, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+            ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = isInPath ? "#10b981" : "#3b82f6";
+        ctx.fill();
+
+        ctx.lineWidth = 2.5;
+        ctx.strokeStyle = "#ffffff";
+        ctx.stroke();
+
+        ctx.fillStyle = "#1e293b";
+        ctx.font = "bold 9.5px 'Plus Jakarta Sans', sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(n.label, n.x, n.y + 22);
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "7.5px monospace";
+        ctx.fillText(n.sub, n.x, n.y - 12);
+    }
+
+    if (activePath.length > 1) {
+        streamProgress = (streamProgress + 0.008) % 1.0;
+        const totalSegments = activePath.length - 1;
+        const segmentIdx = Math.floor(streamProgress * totalSegments);
+        const segmentT = (streamProgress * totalSegments) - segmentIdx;
+
+        const fromNode = nodes[activePath[segmentIdx]];
+        const toNode = nodes[activePath[segmentIdx + 1]];
+
+        if (fromNode && toNode) {
+            const pos = getBezierPoint(fromNode, toNode, segmentT);
+
+            ctx.save();
+            ctx.shadowColor = "#10b981";
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 5.5, 0, Math.PI * 2);
+            ctx.fillStyle = "#059669";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = "#ffffff";
+            ctx.fill();
+            ctx.restore();
+        }
+    }
+}
+
+function startCorridorStream() {
+    if (!canvas) return;
+    if (renderTimer) clearInterval(renderTimer);
+    renderTimer = setInterval(() => {
+        renderFrame();
+    }, 25);
+}
+
+function replayPacketAnimation() {
+    streamProgress = 0.0;
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+    startCorridorStream();
+});
+
+function downloadReceiptScreenshot() {
+    const receiptCanvas = document.createElement("canvas");
+    receiptCanvas.width = 400;
+    receiptCanvas.height = 380;
+    const rCtx = receiptCanvas.getContext("2d");
+
+    rCtx.fillStyle = "#ffffff";
+    rCtx.fillRect(0, 0, 400, 380);
+
+    rCtx.fillStyle = "#0f172a";
+    rCtx.font = "bold 16px Arial";
+    rCtx.fillText("PayRoute Corridor Receipt", 20, 35);
+
+    rCtx.font = "12px Arial";
+    rCtx.fillStyle = "#475569";
+    rCtx.fillText("Status: PAYMENT COMPLETED", 20, 65);
+    rCtx.fillText("Amount Cleared: INR {{ amount }}", 20, 95);
+    rCtx.fillText("Origin Bank: {{ bank }}", 20, 125);
+    rCtx.fillText("Remaining Account Balance: INR {{ '%.2f'|format(new_balance) }}", 20, 155);
+    rCtx.fillText("Routing Algorithm: Dijkstra Shortest Path", 20, 185);
+    rCtx.fillText("Optimized Fee: INR {{ dijkstra.total_cost if dijkstra else 0 }}", 20, 215);
+    rCtx.fillText("Total Latency: {{ dijkstra.total_latency if dijkstra else 0 }} ms", 20, 245);
+
+    rCtx.fillText("Cleared Interbank Corridor:", 20, 280);
+    rCtx.font = "10px monospace";
+    rCtx.fillStyle = "#10b981";
+    rCtx.fillText("{{ dijkstra.path_display if dijkstra else 'Direct' }}", 20, 305);
+
+    rCtx.font = "10px Arial";
+    rCtx.fillStyle = "#94a3b8";
+    rCtx.fillText("Regulated Interbank Clearing Rail &bull; SQLite Audit Verified", 20, 355);
+
+    const link = document.createElement("a");
+    link.download = "PayRoute_Corridor_Receipt_{{ amount }}.png";
+    link.href = receiptCanvas.toDataURL("image/png");
+    link.click();
+}
+</script>
+{% endblock %}
